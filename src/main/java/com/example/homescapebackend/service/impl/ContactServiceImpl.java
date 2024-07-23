@@ -28,4 +28,9 @@ public class ContactServiceImpl implements ContactService {
     public Contact getMessageById(Long id) {
         return contactRepo.findById(id).orElse(null);
     }
+
+    @Override
+    public Long messageCount() {
+        return contactRepo.count();
+    }
 }

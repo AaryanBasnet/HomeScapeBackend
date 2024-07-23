@@ -12,7 +12,11 @@ import com.example.homescapebackend.service.InquiryService;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 
+import java.time.YearMonth;
 import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+
 @RequiredArgsConstructor
 @Service
 public class InquiryImpl implements InquiryService {
@@ -43,4 +47,23 @@ public class InquiryImpl implements InquiryService {
     public List<Inquiry> getAllInquiries() {
         return inquiryRepository.findAll();
     }
+
+    @Override
+    public Map<YearMonth, Map<Integer, Long>> getInquiriesPerMonth() {
+        List<Inquiry> inquiries = inquiryRepository.findAll();
+        return inquiries.stream()
+                .collect(Collectors.groupingBy(
+                        inquiry -> YearMonth.from(inquiry.getCreatedDate()),
+                        Collectors.groupingBy(
+                                inquiry -> inquiry.getHome().getHomeId(),
+                                Collectors.counting()
+                        )
+                ));
+    }
+
+    public Long countInquiries() {
+        return inquiryRepository.count();
+    }
+
+
 }

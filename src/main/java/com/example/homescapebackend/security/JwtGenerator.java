@@ -25,6 +25,7 @@ public class JwtGenerator {
                 .compact();
     }
 
+
     public String generateRefreshToken(String username) {
         Date currentDate = new Date();
         long expireTimeInMillis = currentDate.getTime() + SecurityConstants.JWT_REFRESH_EXPIRATION;

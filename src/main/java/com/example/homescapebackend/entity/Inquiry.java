@@ -6,6 +6,7 @@ import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
 
+import java.time.LocalDate;
 
 
 @Entity
@@ -31,4 +32,6 @@ public class Inquiry {
     @ManyToOne
     @JoinColumn(name = "home_id", nullable = false)
     private Home home;
+
+    private LocalDate createdDate = LocalDate.now();
 }

@@ -8,4 +8,6 @@ public interface ContactService {
     Contact sendMessage(Contact contact);
     List<Contact> getAllMessages();
     Contact getMessageById(Long id);
+
+    Long messageCount();
 }

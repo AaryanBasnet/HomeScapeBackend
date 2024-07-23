@@ -25,4 +25,6 @@ public interface HomeService {
     List<String> getCities();
 
     List<String> getPropertyTypes();
+
+    Long HomeCount();
 }

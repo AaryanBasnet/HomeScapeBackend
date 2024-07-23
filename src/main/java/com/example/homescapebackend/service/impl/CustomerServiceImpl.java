@@ -1,12 +1,16 @@
 package com.example.homescapebackend.service.impl;
 
 import com.example.homescapebackend.entity.Customer;
+import com.example.homescapebackend.entity.Role;
 import com.example.homescapebackend.pojo.CustomerPojo;
 import com.example.homescapebackend.repo.CustomerRepo;
+import com.example.homescapebackend.repo.RoleRepository;
 import com.example.homescapebackend.service.CustomerService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -16,7 +20,12 @@ import java.util.Optional;
 public class CustomerServiceImpl implements CustomerService {
 
         private final CustomerRepo customerRepo;
-        @Override
+    private final PasswordEncoder passwordEncoder;
+    private final RoleRepository roleRepository;
+
+
+
+    @Override
         public void addCustomer(CustomerPojo customerPojo) {
         Customer customer = new Customer();
         customer.setId(customerPojo.getId());
@@ -74,5 +83,33 @@ public class CustomerServiceImpl implements CustomerService {
     @Override
     public Customer getCustomerById(Long id) {
         return customerRepo.findById(Math.toIntExact(id)).orElse(null);
+    }
+
+            @Override
+            public Long customerCount() {
+            return customerRepo.count();
+        }
+
+
+    @Override
+    public void createAdminAccountIfNotExists() {
+        System.out.println("Checking for admin account...");
+        if (!customerRepo.existsByUsername("admin")) {
+            System.out.println("Admin account doesn't exist. Creating now...");
+            Customer admin = new Customer();
+            admin.setUsername("admin");
+            admin.setPassword(passwordEncoder.encode("admin"));
+
+            Optional<Role> role = roleRepository.findByName("ADMIN");
+            if (role.isPresent()) {
+                admin.setRoles(Collections.singletonList(role.get()));
+                customerRepo.save(admin);
+                System.out.println("Admin account created successfully.");
+            } else {
+                System.err.println("ADMIN role not found. Unable to create admin account.");
+            }
+        } else {
+            System.out.println("Admin account already exists.");
+        }
     }
 }

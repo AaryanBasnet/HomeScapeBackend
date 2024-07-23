@@ -3,9 +3,9 @@ package com.example.homescapebackend.security;
 import java.security.SecureRandom;
 
 public class SecurityConstants {
-    public static final long JWT_EXPIRATION = 3600000; // 1 hour in milliseconds
+    public static final long JWT_EXPIRATION = 86400000; // 1 day in milliseconds
     public static final byte[] JWT_SECRET;
-    public static final long JWT_REFRESH_EXPIRATION = 86400000; // e.g., 24 hours in milliseconds
+    public static final long JWT_REFRESH_EXPIRATION = 2592000000L; // 30 days in milliseconds
 
 
     static {

@@ -9,7 +9,9 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.YearMonth;
 import java.util.List;
+import java.util.Map;
 
 @RestController
 @RequestMapping("/api/inquiry")
@@ -43,4 +45,22 @@ public class InquiryController {
                 .build();
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
+
+    @GetMapping("/monthly")
+    public ResponseEntity<Map<YearMonth, Map<Integer, Long>>> getInquiriesPerMonth() {
+        Map<YearMonth, Map<Integer, Long>> inquiriesPerMonth = inquiryService.getInquiriesPerMonth();
+        return new ResponseEntity<>(inquiriesPerMonth, HttpStatus.OK);
+    }
+
+    @GetMapping("/count")
+    public ResponseEntity<GlobalApiResponse<Long>> getInquiryCount() {
+        Long count = inquiryService.countInquiries();
+        return new ResponseEntity<>(GlobalApiResponse.<Long>builder()
+                .data(count)
+                .statusCode(HttpStatus.OK.value())
+                .message("Total inquiry count retrieved successfully!")
+                .build(), HttpStatus.OK);
+    }
+
+
 }

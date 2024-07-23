@@ -118,4 +118,9 @@ public class HomeImpl implements HomeService {
     public List<String> getPropertyTypes() {
         return homeRepository.findDistinctPropertyTypes();
     }
+
+    @Override
+    public Long HomeCount() {
+        return homeRepository.count();
+    }
 }
