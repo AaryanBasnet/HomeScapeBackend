@@ -159,4 +159,13 @@ public class HomeController {
                 .message("Property types retrieved successfully!")
                 .build();
     }
+
+    @GetMapping("/count")
+    public GlobalApiResponse<Long> getHomeCount() {
+        return GlobalApiResponse.<Long>builder()
+                .data(homeService.HomeCount())
+                .statusCode(200)
+                .message("Total home count retrieved successfully!")
+                .build();
+    }
 }

@@ -93,4 +93,13 @@ private final CustomerService customerService;
                 .message("Ground with ID " + id + " updated successfully")
                 .build();
     }
+
+    @GetMapping("/count")
+    public GlobalApiResponse<Long> getCustomerCount() {
+        return GlobalApiResponse.<Long>builder()
+                .data(customerService.customerCount())
+                .statusCode(200)
+                .message("Total customer count retrieved successfully!")
+                .build();
+    }
 }

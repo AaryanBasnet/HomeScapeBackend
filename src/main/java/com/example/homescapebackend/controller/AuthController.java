@@ -1,7 +1,5 @@
 package com.example.homescapebackend.controller;
 
-
-
 import com.example.homescapebackend.entity.Customer;
 import com.example.homescapebackend.entity.Role;
 import com.example.homescapebackend.pojo.AuthResponsePojo;
@@ -9,8 +7,10 @@ import com.example.homescapebackend.pojo.CustomerPojo;
 import com.example.homescapebackend.repo.CustomerRepo;
 import com.example.homescapebackend.repo.RoleRepository;
 import com.example.homescapebackend.security.JwtGenerator;
+import com.example.homescapebackend.service.CustomerService;
+import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
@@ -25,7 +25,7 @@ import org.springframework.web.bind.annotation.*;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
-
+@RequiredArgsConstructor
 @RestController
 @RequestMapping("/api/auth")
 public class AuthController {
@@ -33,29 +33,36 @@ public class AuthController {
     private final CustomerRepo customerRepo;
     private final RoleRepository roleRepository;
     private final PasswordEncoder passwordEncoder;
-    @Autowired
     private final JwtGenerator jwtGenerator;
+    private final CustomerService cus;
 
-    @PostMapping("/refresh")
-    public ResponseEntity<?> refreshToken(HttpServletRequest request, HttpServletResponse response) {
-        String refreshToken = request.getHeader("Refresh-Token");
 
-        if (refreshToken != null && jwtGenerator.validateToken(refreshToken)) {
-            String username = jwtGenerator.getUsernameFromJwt(refreshToken);
-            String newAccessToken = jwtGenerator.generateToken(username);
 
-            return ResponseEntity.ok().body(newAccessToken);
-        } else {
-            return ResponseEntity.status(403).body("Invalid or expired refresh token");
-        }
+
+    @PostConstruct
+    public void init() {
+        cus.createAdminAccountIfNotExists();
     }
 
-    public AuthController(AuthenticationManager authenticationManager, CustomerRepo customerRepo, RoleRepository roleRepository, PasswordEncoder passwordEncoder, JwtGenerator jwtGenerator) {
-        this.authenticationManager = authenticationManager;
-        this.customerRepo = customerRepo;
-        this.roleRepository = roleRepository;
-        this.passwordEncoder = passwordEncoder;
-        this.jwtGenerator = jwtGenerator;
+    @PostMapping("/refresh")
+    public ResponseEntity<?> refreshToken(HttpServletRequest request) {
+        String refreshToken = request.getHeader("Refresh-Token");
+
+        if (refreshToken == null) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Refresh token is missing");
+        }
+
+        try {
+            if (jwtGenerator.validateToken(refreshToken)) {
+                String username = jwtGenerator.getUsernameFromJwt(refreshToken);
+                String newAccessToken = jwtGenerator.generateToken(username);
+                return ResponseEntity.ok(new AuthResponsePojo(newAccessToken, refreshToken, null, null));
+            } else {
+                return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Invalid or expired refresh token");
+            }
+        } catch (AuthenticationException e) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body("Invalid or expired refresh token");
+        }
     }
 
     @PostMapping("/login")
@@ -64,12 +71,14 @@ public class AuthController {
                 new UsernamePasswordAuthenticationToken(loginPojo.getUsername(), loginPojo.getPassword())
         );
         SecurityContextHolder.getContext().setAuthentication(authentication);
-        String token = jwtGenerator.generateToken(loginPojo.getUsername());
+
+        String accessToken = jwtGenerator.generateToken(loginPojo.getUsername());
+        String refreshToken = jwtGenerator.generateRefreshToken(loginPojo.getUsername());
 
         Customer user = customerRepo.findByUsername(loginPojo.getUsername()).orElseThrow();
         List<String> roles = user.getRoles().stream().map(Role::getName).toList();
 
-        AuthResponsePojo response = new AuthResponsePojo(token, user.getId(), roles);
+        AuthResponsePojo response = new AuthResponsePojo(accessToken, refreshToken, user.getId(), roles);
         return new ResponseEntity<>(response, HttpStatus.OK);
     }
 
@@ -129,7 +138,6 @@ public class AuthController {
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).build();
         }
     }
-
 
     @GetMapping("/secured")
     public ResponseEntity<String> securedEndpoint(@RequestHeader("Authorization") String token) {

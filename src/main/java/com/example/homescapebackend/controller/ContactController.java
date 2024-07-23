@@ -74,4 +74,14 @@ public class ContactController {
                 .data(contact)
                 .build(), HttpStatus.OK);
     }
+
+    @GetMapping("/count")
+    public ResponseEntity<GlobalApiResponse<Long>> getMessageCount() {
+        Long count = contactService.messageCount();
+        return new ResponseEntity<>(GlobalApiResponse.<Long>builder()
+                .data(count)
+                .statusCode(HttpStatus.OK.value())
+                .message("Total message count retrieved successfully!")
+                .build(), HttpStatus.OK);
+    }
 }
