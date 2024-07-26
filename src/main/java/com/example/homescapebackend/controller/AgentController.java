@@ -72,4 +72,22 @@ public class AgentController {
                     .build();
         }
     }
+
+    @PutMapping("/update/{id}")
+    public GlobalApiResponse<String> update(@PathVariable Integer id, @RequestBody AgentPojo agentPojo) {
+        if (agentService.existsById(id)) {
+            agentService.updateAgentData(id, agentPojo);
+            return GlobalApiResponse.<String>builder()
+                    .data("Agent updated successfully!")
+                    .statusCode(200)
+                    .message("Agent updated successfully!")
+                    .build();
+        } else {
+            return GlobalApiResponse.<String>builder()
+                    .statusCode(404)
+                    .message("Agent not found!")
+                    .build();
+        }
+    }
+
 }
