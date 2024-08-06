@@ -29,7 +29,6 @@ public class CustomerServiceImpl implements CustomerService {
         public void addCustomer(CustomerPojo customerPojo) {
         Customer customer = new Customer();
         customer.setId(customerPojo.getId());
-//        customer.setTelNo(customerPojo.getTelNo());
         customer.setPassword(customerPojo.getPassword());
         customer.setUsername(customerPojo.getUsername());
         customerRepo.save(customer);
@@ -58,9 +57,8 @@ public class CustomerServiceImpl implements CustomerService {
             Customer existingCustomer = custoomerOptional.get();
 
             updateCustomerProperties(existingCustomer, customerPojo);
-            customerRepo.save(existingCustomer); // Save the updated student
+            customerRepo.save(existingCustomer);
         } else {
-            // Handle the case where the student with the given ID does not exist
             throw new IllegalArgumentException("Student with ID " + id + " not found");
         }
     }
@@ -69,7 +67,6 @@ public class CustomerServiceImpl implements CustomerService {
 
         private void updateCustomerProperties(Customer customer, CustomerPojo customerPojo) {
         customer.setId(customerPojo.getId());
-//        customer.setTelNo(customerPojo.getTelNo());
         customer.setPassword(customerPojo.getPassword());
         customer.setUsername(customerPojo.getUsername());
         customerRepo.save(customer);

@@ -11,7 +11,7 @@ import com.example.homescapebackend.service.CustomerService;
 import jakarta.annotation.PostConstruct;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.AuthenticationManager;
@@ -146,7 +146,6 @@ public class AuthController {
         }
 
         String username = jwtGenerator.getUsernameFromJwt(token);
-        // Use username for secure endpoint logic
 
         return ResponseEntity.ok("Hello, " + username + "! This is a secured endpoint.");
     }

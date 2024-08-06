@@ -91,7 +91,6 @@ public class HomeImpl implements HomeService {
 
     @Override
     public List<Home> filterHomes(String city, String propertyType, Long minPrice, Long maxPrice) {
-        // Handle default values
         if ("Location (any)".equals(city)) {
             city = null;
         }

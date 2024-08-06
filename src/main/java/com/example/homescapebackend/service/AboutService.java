@@ -1,6 +1,5 @@
 package com.example.homescapebackend.service;
 
-import com.example.homescapebackend.entity.About;
 import com.example.homescapebackend.pojo.AboutPojo;
 
 import java.util.List;

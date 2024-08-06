@@ -10,7 +10,6 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.util.List;
-import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
@@ -23,7 +22,6 @@ public class StorageService {
         String filePath = FOLDER_PATH + file.getOriginalFilename();
         System.out.println("Attempting to upload image: " + file.getOriginalFilename() + " to " + filePath);
 
-        // Check if file already exists
         List<FileData> existingFiles = fileDataRepository.findByName(file.getOriginalFilename() );
         if (!existingFiles.isEmpty()) {
             System.out.println("Warning: " + existingFiles.size() + " entries found for filename: " + file.getOriginalFilename());
@@ -47,7 +45,6 @@ public class StorageService {
         System.out.println("Attempting to download image: " + fileName);
         List<FileData> fileDataList = fileDataRepository.findByName(fileName);
         if (!fileDataList.isEmpty()) {
-            // Use the first result if multiple exist
             FileData fileData = fileDataList.get(0);
             String filePath = fileData.getFilePath();
             System.out.println("File path found: " + filePath);
@@ -74,7 +71,6 @@ public class StorageService {
     public void cleanupDuplicateEntries(String fileName) {
         List<FileData> duplicates = fileDataRepository.findByName(fileName);
         if (duplicates.size() > 1) {
-            // Keep the first entry, delete the rest
             for (int i = 1; i < duplicates.size(); i++) {
                 fileDataRepository.delete(duplicates.get(i));
             }

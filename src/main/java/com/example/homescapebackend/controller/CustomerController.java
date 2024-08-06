@@ -5,7 +5,6 @@ import com.example.homescapebackend.pojo.CustomerPojo;
 import com.example.homescapebackend.service.CustomerService;
 import com.example.homescapebackend.shared.GlobalApiResponse;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;

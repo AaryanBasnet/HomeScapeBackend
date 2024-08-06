@@ -1,9 +1,9 @@
 package com.example.homescapebackend.service;
 
 import com.example.homescapebackend.entity.Agent;
-import com.example.homescapebackend.entity.Home;
+
 import com.example.homescapebackend.pojo.AgentPojo;
-import com.example.homescapebackend.pojo.HomePojo;
+
 
 import java.util.List;
 import java.util.Optional;

@@ -5,7 +5,7 @@ import com.example.homescapebackend.pojo.AgentPojo;
 import com.example.homescapebackend.repo.AgentRepo;
 import com.example.homescapebackend.service.AgentService;
 import lombok.RequiredArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
+
 import org.springframework.stereotype.Service;
 
 import java.util.List;

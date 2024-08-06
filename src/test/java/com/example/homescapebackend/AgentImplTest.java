@@ -3,7 +3,6 @@ package com.example.homescapebackend;
 import com.example.homescapebackend.entity.Agent;
 import com.example.homescapebackend.pojo.AgentPojo;
 import com.example.homescapebackend.repo.AgentRepo;
-import com.example.homescapebackend.service.AgentService;
 import com.example.homescapebackend.service.impl.AgentImpl;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
