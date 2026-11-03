@@ -1,0 +1,26 @@
+# PostgreSQL for local development. The Spring Boot app itself runs on your machine (./mvnw spring-boot:run).
+#
+#   cp .env.example .env      # then choose your own DB_PASSWORD
+#   docker compose up -d      # start the database
+#   docker compose down       # stop it (the data stays in the volume; add -v to wipe it)
+
+services:
+  db:
+    image: postgres:16-alpine
+    container_name: homescape-db
+    environment:
+      POSTGRES_DB: homescapedb
+      POSTGRES_USER: ${DB_USERNAME:-postgres}
+      POSTGRES_PASSWORD: ${DB_PASSWORD:?Set DB_PASSWORD in .env (copy .env.example)}
+    ports:
+      - "5432:5432"
+    volumes:
+      - homescape-data:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${DB_USERNAME:-postgres} -d homescapedb"]
+      interval: 5s
+      timeout: 3s
+      retries: 10
+
+volumes:
+  homescape-data:

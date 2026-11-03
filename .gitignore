@@ -31,3 +31,7 @@ build/
 
 ### VS Code ###
 .vscode/
+
+### Uploaded photos and local settings ###
+uploads/
+.env

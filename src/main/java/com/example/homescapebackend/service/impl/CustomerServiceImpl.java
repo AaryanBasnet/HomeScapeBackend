@@ -7,6 +7,7 @@ import com.example.homescapebackend.repo.CustomerRepo;
 import com.example.homescapebackend.repo.RoleRepository;
 import com.example.homescapebackend.service.CustomerService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
@@ -88,25 +89,43 @@ public class CustomerServiceImpl implements CustomerService {
         }
 
 
+    @Value("${homescape.admin.username:}")
+    private String adminUsername;
+
+    @Value("${homescape.admin.password:}")
+    private String adminPassword;
+
+    /** The roles the rest of the code looks up by name. They are created here if they are missing. */
+    private void ensureRoles() {
+        for (String name : List.of("USER", "ADMIN")) {
+            if (roleRepository.findByName(name).isEmpty()) {
+                Role role = new Role();
+                role.setName(name);
+                roleRepository.save(role);
+            }
+        }
+    }
+
+    /**
+     * Runs once at start-up. Creates the USER and ADMIN roles, and, only if ADMIN_USERNAME and ADMIN_PASSWORD
+     * are set in the environment, a first admin account. No credentials are written in the code.
+     */
     @Override
     public void createAdminAccountIfNotExists() {
-        System.out.println("Checking for admin account...");
-        if (!customerRepo.existsByUsername("admin")) {
-            System.out.println("Admin account doesn't exist. Creating now...");
-            Customer admin = new Customer();
-            admin.setUsername("admin");
-            admin.setPassword(passwordEncoder.encode("admin"));
-
-            Optional<Role> role = roleRepository.findByName("ADMIN");
-            if (role.isPresent()) {
-                admin.setRoles(Collections.singletonList(role.get()));
-                customerRepo.save(admin);
-                System.out.println("Admin account created successfully.");
-            } else {
-                System.err.println("ADMIN role not found. Unable to create admin account.");
-            }
-        } else {
-            System.out.println("Admin account already exists.");
+        ensureRoles();
+        if (adminUsername.isBlank() || adminPassword.isBlank()) {
+            System.out.println("ADMIN_USERNAME / ADMIN_PASSWORD not set: no admin account created.");
+            return;
         }
+        if (customerRepo.existsByUsername(adminUsername)) {
+            System.out.println("Admin account already exists.");
+            return;
+        }
+        Customer admin = new Customer();
+        admin.setUsername(adminUsername);
+        admin.setPassword(passwordEncoder.encode(adminPassword));
+        admin.setRoles(Collections.singletonList(roleRepository.findByName("ADMIN").orElseThrow()));
+        customerRepo.save(admin);
+        System.out.println("Admin account created.");
     }
 }

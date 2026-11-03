@@ -2,13 +2,16 @@ package com.example.homescapebackend.service.impl;
 
 import com.example.homescapebackend.entity.FileData;
 import com.example.homescapebackend.repo.FileDataRepository;
+import jakarta.annotation.PostConstruct;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import org.springframework.web.multipart.MultipartFile;
 
 import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 import java.util.stream.Collectors;
 
@@ -16,10 +19,24 @@ import java.util.stream.Collectors;
 public class StorageService {
     @Autowired
     private FileDataRepository fileDataRepository;
-    public final String FOLDER_PATH = "D:/HomeScapeBackend/src/main/java/com/example/homescapebackend/images/";
+    @Value("${homescape.upload-dir:uploads/}")
+    private String uploadDir;
+
+    /** Folder that holds the uploaded photos, always ending in a slash. Set from homescape.upload-dir. */
+    public String FOLDER_PATH = "uploads/";
+
+    @PostConstruct
+    void prepareUploadFolder() {
+        // Absolute on purpose: MultipartFile.transferTo() resolves a relative path against its own temp folder.
+        File folder = new File(uploadDir).getAbsoluteFile();
+        folder.mkdirs();
+        FOLDER_PATH = folder.toURI().getPath().replaceFirst("^/([A-Za-z]:)", "$1");
+    }
 
     public String uploadImageToFileSystem(MultipartFile file) throws IOException {
-        String filePath = FOLDER_PATH + file.getOriginalFilename();
+        // Keep only the file name, so a name like "../x" cannot write outside the upload folder.
+        String safeName = Paths.get(file.getOriginalFilename()).getFileName().toString();
+        String filePath = FOLDER_PATH + safeName;
         System.out.println("Attempting to upload image: " + file.getOriginalFilename() + " to " + filePath);
 
         List<FileData> existingFiles = fileDataRepository.findByName(file.getOriginalFilename() );
